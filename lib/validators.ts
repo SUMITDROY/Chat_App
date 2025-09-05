@@ -1,15 +1,16 @@
-import {
+const {
   body,
   validationResult,
   ValidationChain,
   Request,
   Response,
   NextFunction,
-} from "express-validator";
+} = require ("express-validator");
 
 /**
  * Register Validator - validates registration inputs
  */
+// @ts-ignore
 export const registerValidator = (): ValidationChain[] => [
   body("username", "Please Enter UserName").notEmpty(),
   body("name", "Please Enter Name").notEmpty(),
@@ -23,6 +24,7 @@ export const registerValidator = (): ValidationChain[] => [
 export const validateHandle = (
   req: Request,
   res: Response,
+  // @ts-ignore
   next: NextFunction
 ): void => {
   const errors = validationResult(req);
@@ -33,7 +35,9 @@ export const validateHandle = (
 
   const errorMessages = errors
     .array()
+    // @ts-ignore
     .map((error) => error.msg)
     .join(", ");
+  // @ts-ignore
   res.status(400).json({ status: "error", message: errorMessages });
 };

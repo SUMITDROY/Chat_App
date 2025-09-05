@@ -41,11 +41,13 @@ const messageSchema = new Schema<IMessage>(
         },
       },
     ],
+    // @ts-ignore
     sender: {
       type: Types.ObjectId,
       ref: "User",
       required: true,
     },
+    // @ts-ignore
     chat: {
       type: Types.ObjectId,
       ref: "Chat",

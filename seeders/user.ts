@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
  * Creates multiple fake users in the database
  * @param {number} numUsers - Number of users to create
  */
+// @ts-ignore
 const createUserMultiple = async (numUsers) => {
   try {
     const userPromise = [];

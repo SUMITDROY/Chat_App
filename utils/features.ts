@@ -1,15 +1,16 @@
-const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
-const uuid = require("uuid");
-const cloudinary = require("cloudinary");
-const { getSocketID } = require("../lib/socketManager");
+import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
+import cloudinary from "cloudinary";
+import { getSocketID } from "../lib/socketManager";
+import { Request, Response } from "express";
 
 // ======================
 // Cookie Options
 // ======================
-const cookieOptions = {
+export const cookieOptions = {
   maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
-  sameSite: "none",
+  sameSite: "none" as const,
   httpOnly: true,
   secure: true,
 };
@@ -17,13 +18,13 @@ const cookieOptions = {
 // ======================
 // MongoDB Connection
 // ======================
-const connectDB = async (url) => {
+export const connectDB = async (url: string): Promise<void> => {
   mongoose
     .connect(url)
     .then(() => {
       console.log("✅ Connected to Database");
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       console.error("❌ DB Connection Error:", err);
     });
 };
@@ -31,7 +32,16 @@ const connectDB = async (url) => {
 // ======================
 // Send JWT Token Response
 // ======================
-const sendToken = async (res, user, statusCode, message) => {
+export const sendToken = async (
+  res: Response,
+  user: { _id: string },
+  statusCode: number,
+  message: string
+): Promise<Response> => {
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET is not defined in environment variables");
+  }
+
   const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
 
   return res.status(statusCode).json({
@@ -45,7 +55,12 @@ const sendToken = async (res, user, statusCode, message) => {
 // ======================
 // Emit Socket Event
 // ======================
-const emitEvent = (req, event, users, data) => {
+export const emitEvent = (
+  req: Request,
+  event: string,
+  users: string[],
+  data: unknown
+): void => {
   const io = req.app.get("io");
   const membersSockets = getSocketID(users);
 
@@ -55,7 +70,15 @@ const emitEvent = (req, event, users, data) => {
 // ======================
 // Upload Files to Cloudinary
 // ======================
-const uploadFilesToClodinary = async (files, folder) => {
+interface FileType {
+  mimetype: string;
+  buffer: Buffer;
+}
+
+export const uploadFilesToClodinary = async (
+  files: FileType[],
+  folder: string
+): Promise<{ public_id: string; url: string }[]> => {
   try {
     const uploadPromises = files.map((file) => {
       let finalFolder = folder;
@@ -69,7 +92,7 @@ const uploadFilesToClodinary = async (files, folder) => {
         } else if (file.mimetype.startsWith("video/")) {
           finalFolder = "video_attachments";
         } else {
-          finalFolder = "file_attachments"; // For unsupported file types
+          finalFolder = "file_attachments";
         }
       }
 
@@ -78,24 +101,25 @@ const uploadFilesToClodinary = async (files, folder) => {
         "base64"
       )}`;
 
-      return new Promise((resolve, reject) => {
-        cloudinary.v2.uploader.upload(
-          base64String,
-          { resource_type: "auto", folder: finalFolder },
-          (error, result) => {
-            if (error) return reject(error);
-            resolve({
-              public_id: result.public_id,
-              url: result.secure_url,
-            });
-          }
-        );
-      });
+      return new Promise<{ public_id: string; url: string }>(
+        (resolve, reject) => {
+          cloudinary.v2.uploader.upload(
+            base64String,
+            { resource_type: "auto", folder: finalFolder },
+            (error, result) => {
+              if (error || !result) return reject(error);
+              resolve({
+                public_id: result.public_id,
+                url: result.secure_url,
+              });
+            }
+          );
+        }
+      );
     });
 
-    // Wait for all uploads to complete
     return await Promise.all(uploadPromises);
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(`Error uploading files to Cloudinary: ${error.message}`);
   }
 };
@@ -103,28 +127,18 @@ const uploadFilesToClodinary = async (files, folder) => {
 // ======================
 // Delete Files from Cloudinary
 // ======================
-const deleteFilesFromClodinary = async (public_ids) => {
+export const deleteFilesFromClodinary = async (
+  public_ids: string[]
+): Promise<void> => {
   try {
     const deletePromises = public_ids.map((id) =>
       cloudinary.v2.uploader.destroy(id)
     );
-    await Promise.all(deletePromises);
 
+    await Promise.all(deletePromises);
     console.log("✅ Files deleted successfully from Cloudinary");
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Error deleting files from Cloudinary:", error.message);
     throw new Error(`Error deleting files: ${error.message}`);
   }
-};
-
-// ======================
-// Module Exports
-// ======================
-module.exports = {
-  connectDB,
-  sendToken,
-  cookieOptions,
-  emitEvent,
-  uploadFilesToClodinary,
-  deleteFilesFromClodinary,
 };

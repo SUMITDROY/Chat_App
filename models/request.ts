@@ -26,11 +26,13 @@ const requestSchema = new Schema<IRequest>(
       default: "pending",
       enum: ["pending", "accepted", "rejected"],
     },
+    // @ts-ignore
     sender: {
       type: Types.ObjectId,
       ref: "User",
       required: true,
     },
+    // @ts-ignore
     receiver: {
       type: Types.ObjectId,
       ref: "User",

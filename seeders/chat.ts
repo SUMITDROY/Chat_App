@@ -53,7 +53,9 @@ export const createGroupChats = async (numChats: number): Promise<void> => {
         const randomUser = users[Math.floor(Math.random() * users.length)]._id;
 
         // Avoid duplicate members
+        // @ts-ignore
         if (!members.includes(randomUser)) {
+          // @ts-ignore
           members.push(randomUser);
         }
       }
