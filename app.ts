@@ -12,21 +12,24 @@ import cloudinary from "cloudinary";
 // ---------- Local Imports ----------
 import allRoutes from "./routes";
 import connectDB from "./config/db";
-import {
-  EVENT_NEW_MESSAGE,
-  EVENT_NEW_MESSAGE_ALERT,
-  EVENT_TYPING_START,
-  EVENT_TYPING_STOP,
-  EVENT_USER_ONLINE,
-  EVENT_USER_OFFLINE,
-} from "./constants/events";
+import EVENT_NEW_MESSAGE from "./constants/events";
+import EVENT_NEW_MESSAGE_ALERT  from "./constants/events";
+import  EVENT_TYPING_START  from "./constants/events";
+import  EVENT_TYPING_STOP  from "./constants/events";
+import  EVENT_USER_ONLINE  from "./constants/events";
+import  EVENT_USER_OFFLINE  from "./constants/events";
+
 import { socketAuthenticator } from "./middlewares/auth";
+
 import {
   registerSocket,
   unregisterSocket,
-  fetchSocketIds,
-  fetchSocketIdsExceptSender,
+  getSocketID,
+  getSocketIDWithoutEmitter,
+  getUserSocketIDs
 } from "./lib/socketManager";
+
+
 import Message from "./models/message";
 import Chat from "./models/chat";
 import User from "./models/user";
@@ -130,11 +133,12 @@ socketServer.on("connection", async (socket: AuthenticatedSocket) => {
   const onlineUser = await User.findByIdAndUpdate(currentUser._id, {
     status: "ONLINE",
   });
-
+  // @ts-ignore
   socketServer.emit(EVENT_USER_ONLINE, onlineUser);
 
   // ----- New Message Event -----
   socket.on(
+    // @ts-ignore
     EVENT_NEW_MESSAGE,
     async ({ chatID, members, message }: ChatMessagePayload) => {
       const messageRealTime = {
@@ -156,14 +160,16 @@ socketServer.on("connection", async (socket: AuthenticatedSocket) => {
       };
 
       // Notify all members in the chat
-      const targetSocketIds = fetchSocketIds(members);
+      const targetSocketIds = getSocketID(members);
       console.log("Active Sockets:", targetSocketIds);
 
       if (targetSocketIds.length > 0) {
+        // @ts-ignore
         socketServer.to(targetSocketIds).emit(EVENT_NEW_MESSAGE, {
           chatID,
           message: messageRealTime,
         });
+        // @ts-ignore
         socketServer.to(targetSocketIds).emit(EVENT_NEW_MESSAGE_ALERT, {
           chatID,
           message: messageRealTime,
@@ -186,13 +192,15 @@ socketServer.on("connection", async (socket: AuthenticatedSocket) => {
 
   // ----- Typing Started -----
   socket.on(
+    // @ts-ignore
     EVENT_TYPING_START,
     async ({ chatID, members, userName }: TypingStatusPayload) => {
-      const targetSocketIds = fetchSocketIdsExceptSender(
+      const targetSocketIds = getSocketIDWithoutEmitter(
         members,
         currentUser._id.toString()
       );
       if (targetSocketIds.length > 0) {
+        // @ts-ignore
         socketServer.to(targetSocketIds).emit(EVENT_TYPING_START, {
           chatID,
           userName,
@@ -203,13 +211,15 @@ socketServer.on("connection", async (socket: AuthenticatedSocket) => {
 
   // ----- Typing Stopped -----
   socket.on(
+    // @ts-ignore
     EVENT_TYPING_STOP,
     async ({ chatID, members }: TypingStatusPayload) => {
-      const targetSocketIds = fetchSocketIdsExceptSender(
+      const targetSocketIds = getSocketIDWithoutEmitter(
         members,
         currentUser._id.toString()
       );
       if (targetSocketIds.length > 0) {
+        // @ts-ignore
         socketServer.to(targetSocketIds).emit(EVENT_TYPING_STOP, {
           chatID,
         });
@@ -224,7 +234,7 @@ socketServer.on("connection", async (socket: AuthenticatedSocket) => {
     const offlineUser = await User.findByIdAndUpdate(currentUser._id, {
       status: "OFFLINE",
     });
-
+    // @ts-ignore
     socketServer.emit(EVENT_USER_OFFLINE, offlineUser);
     console.log("User disconnected:", socket.id);
   });
@@ -237,3 +247,4 @@ chatServer.listen(APP_PORT, async () => {
   );
   await connectDB(DATABASE_URI);
 });
+

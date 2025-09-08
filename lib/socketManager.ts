@@ -9,18 +9,19 @@ const userSocketIDs: Map<string, string> = new Map();
 export const getUserSocketIDs = (): Map<string, string> => userSocketIDs;
 
 /**
- * Add a socket ID for a user
+ * Register a socket ID for a user
  */
-export const addSocketID = (userID: string, socketID: string): void => {
+export const registerSocket = (userID: string, socketID: string): void => {
   userSocketIDs.set(userID, socketID);
-  console.log(userSocketIDs, "userSocketIDs");
+  console.log("✅ Registered Socket:", userSocketIDs);
 };
 
 /**
- * Remove a socket ID for a user
+ * Unregister a socket ID for a user
  */
-export const removeSocketID = (userID: string): void => {
+export const unregisterSocket = (userID: string): void => {
   userSocketIDs.delete(userID);
+  console.log(`❌ Socket removed for user: ${userID}`);
 };
 
 /**
@@ -37,10 +38,7 @@ export const getSocketIDWithoutEmitter = (
   userIDs: string[],
   currentUserID: string
 ): (string | undefined)[] => {
-  return userIDs.map((userId) => {
-    if (userId === currentUserID) {
-      return undefined;
-    }
-    return userSocketIDs.get(userId.toString());
-  });
+  return userIDs
+    .filter((userId) => userId !== currentUserID)
+    .map((userId) => userSocketIDs.get(userId.toString()));
 };

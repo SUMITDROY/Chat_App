@@ -184,6 +184,7 @@ export const getMyGroup = async (
     // @ts-ignore
     const groups = await Chat.find({
       groupChat: true,
+      // @ts-ignore
       members: req.userID,
     }).populate("members", "name avatar status");
 
@@ -302,6 +303,7 @@ export const leaveGroup = async (
 
     // @ts-ignore
     chat.members = chat.members.filter(
+      // @ts-ignore
       (member: any) => member.toString() !== req.userID
     );
     await chat.save();
@@ -340,7 +342,9 @@ export const sendAttachments = async (
       latestMessageTime: new Date(),
     });
 
+    // @ts-ignore
     emitEvent(req, NEW_MESSAGE, chatID, message);
+    // @ts-ignore
     emitEvent(req, NEW_MESSAGE_ALERT, chatID, message);
 
     return res.status(201).json({

@@ -1,1 +1,36 @@
 "use strict";
+// ---------- Event Constants ----------
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.REMOVE_GROUP_ADMIN = exports.MAKE_GROUP_ADMIN = exports.TYPING_STOPPED_MESSAGE = exports.TYPING_MESSAGE = exports.NEW_MESSAGE = exports.USER_OFFLINE = exports.USER_ONLINE = exports.NEW_REQUEST = exports.NEW_MESSAGE_ALERT = exports.NEW_ATTACHMENT = exports.ADDED_IN_GROUP = exports.REFETCH_GROUP_DETAIL = exports.REFETCH_CHATS = exports.ALERT = void 0;
+exports.ALERT = "ALERT";
+exports.REFETCH_CHATS = "REFETCH_CHATS";
+exports.REFETCH_GROUP_DETAIL = "REFETCH_GROUP_DETAIL";
+exports.ADDED_IN_GROUP = "ADDED_IN_GROUP";
+exports.NEW_ATTACHMENT = "NEW_ATTACHMENT";
+exports.NEW_MESSAGE_ALERT = "NEW_MESSAGE_ALERT";
+exports.NEW_REQUEST = "NEW_REQUEST";
+exports.USER_ONLINE = "USER_ONLINE";
+exports.USER_OFFLINE = "USER_OFFLINE";
+exports.NEW_MESSAGE = "NEW_MESSAGE";
+exports.TYPING_MESSAGE = "TYPING_MESSAGE";
+exports.TYPING_STOPPED_MESSAGE = "TYPING_STOPPED_MESSAGE";
+exports.MAKE_GROUP_ADMIN = "MAKE_GROUP_ADMIN";
+exports.REMOVE_GROUP_ADMIN = "REMOVE_GROUP_ADMIN";
+// ---------- Default Export (optional) ----------
+const events = {
+    ALERT: exports.ALERT,
+    REFETCH_CHATS: exports.REFETCH_CHATS,
+    REFETCH_GROUP_DETAIL: exports.REFETCH_GROUP_DETAIL,
+    ADDED_IN_GROUP: exports.ADDED_IN_GROUP,
+    NEW_ATTACHMENT: exports.NEW_ATTACHMENT,
+    NEW_MESSAGE_ALERT: exports.NEW_MESSAGE_ALERT,
+    NEW_REQUEST: exports.NEW_REQUEST,
+    USER_ONLINE: exports.USER_ONLINE,
+    USER_OFFLINE: exports.USER_OFFLINE,
+    NEW_MESSAGE: exports.NEW_MESSAGE,
+    TYPING_MESSAGE: exports.TYPING_MESSAGE,
+    TYPING_STOPPED_MESSAGE: exports.TYPING_STOPPED_MESSAGE,
+    MAKE_GROUP_ADMIN: exports.MAKE_GROUP_ADMIN,
+    REMOVE_GROUP_ADMIN: exports.REMOVE_GROUP_ADMIN,
+};
+exports.default = events;
