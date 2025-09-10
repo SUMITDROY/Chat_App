@@ -25,7 +25,12 @@ const cloudinary_1 = __importDefault(require("cloudinary"));
 // ---------- Local Imports ----------
 const routes_1 = __importDefault(require("./routes"));
 const db_1 = __importDefault(require("./config/db"));
-const events_1 = require("./constants/events");
+const events_1 = __importDefault(require("./constants/events"));
+const events_2 = __importDefault(require("./constants/events"));
+const events_3 = __importDefault(require("./constants/events"));
+const events_4 = __importDefault(require("./constants/events"));
+const events_5 = __importDefault(require("./constants/events"));
+const events_6 = __importDefault(require("./constants/events"));
 const auth_1 = require("./middlewares/auth");
 const socketManager_1 = require("./lib/socketManager");
 const message_1 = __importDefault(require("./models/message"));
@@ -91,9 +96,12 @@ socketServer.on("connection", (socket) => __awaiter(void 0, void 0, void 0, func
     const onlineUser = yield user_1.default.findByIdAndUpdate(currentUser._id, {
         status: "ONLINE",
     });
-    socketServer.emit(events_1.EVENT_USER_ONLINE, onlineUser);
+    // @ts-ignore
+    socketServer.emit(events_5.default, onlineUser);
     // ----- New Message Event -----
-    socket.on(events_1.EVENT_NEW_MESSAGE, (_a) => __awaiter(void 0, [_a], void 0, function* ({ chatID, members, message }) {
+    socket.on(
+    // @ts-ignore
+    events_1.default, (_a) => __awaiter(void 0, [_a], void 0, function* ({ chatID, members, message }) {
         const messageRealTime = {
             content: message,
             _id: (0, uuid_1.v4)(),
@@ -111,14 +119,16 @@ socketServer.on("connection", (socket) => __awaiter(void 0, void 0, void 0, func
             chat: chatID,
         };
         // Notify all members in the chat
-        const targetSocketIds = (0, socketManager_1.fetchSocketIds)(members);
+        const targetSocketIds = (0, socketManager_1.getSocketID)(members);
         console.log("Active Sockets:", targetSocketIds);
         if (targetSocketIds.length > 0) {
-            socketServer.to(targetSocketIds).emit(events_1.EVENT_NEW_MESSAGE, {
+            // @ts-ignore
+            socketServer.to(targetSocketIds).emit(events_1.default, {
                 chatID,
                 message: messageRealTime,
             });
-            socketServer.to(targetSocketIds).emit(events_1.EVENT_NEW_MESSAGE_ALERT, {
+            // @ts-ignore
+            socketServer.to(targetSocketIds).emit(events_2.default, {
                 chatID,
                 message: messageRealTime,
             });
@@ -137,20 +147,26 @@ socketServer.on("connection", (socket) => __awaiter(void 0, void 0, void 0, func
         }
     }));
     // ----- Typing Started -----
-    socket.on(events_1.EVENT_TYPING_START, (_a) => __awaiter(void 0, [_a], void 0, function* ({ chatID, members, userName }) {
-        const targetSocketIds = (0, socketManager_1.fetchSocketIdsExceptSender)(members, currentUser._id.toString());
+    socket.on(
+    // @ts-ignore
+    events_3.default, (_a) => __awaiter(void 0, [_a], void 0, function* ({ chatID, members, userName }) {
+        const targetSocketIds = (0, socketManager_1.getSocketIDWithoutEmitter)(members, currentUser._id.toString());
         if (targetSocketIds.length > 0) {
-            socketServer.to(targetSocketIds).emit(events_1.EVENT_TYPING_START, {
+            // @ts-ignore
+            socketServer.to(targetSocketIds).emit(events_3.default, {
                 chatID,
                 userName,
             });
         }
     }));
     // ----- Typing Stopped -----
-    socket.on(events_1.EVENT_TYPING_STOP, (_a) => __awaiter(void 0, [_a], void 0, function* ({ chatID, members }) {
-        const targetSocketIds = (0, socketManager_1.fetchSocketIdsExceptSender)(members, currentUser._id.toString());
+    socket.on(
+    // @ts-ignore
+    events_4.default, (_a) => __awaiter(void 0, [_a], void 0, function* ({ chatID, members }) {
+        const targetSocketIds = (0, socketManager_1.getSocketIDWithoutEmitter)(members, currentUser._id.toString());
         if (targetSocketIds.length > 0) {
-            socketServer.to(targetSocketIds).emit(events_1.EVENT_TYPING_STOP, {
+            // @ts-ignore
+            socketServer.to(targetSocketIds).emit(events_4.default, {
                 chatID,
             });
         }
@@ -161,7 +177,8 @@ socketServer.on("connection", (socket) => __awaiter(void 0, void 0, void 0, func
         const offlineUser = yield user_1.default.findByIdAndUpdate(currentUser._id, {
             status: "OFFLINE",
         });
-        socketServer.emit(events_1.EVENT_USER_OFFLINE, offlineUser);
+        // @ts-ignore
+        socketServer.emit(events_6.default, offlineUser);
         console.log("User disconnected:", socket.id);
     }));
 }));
@@ -169,5 +186,5 @@ socketServer.on("connection", (socket) => __awaiter(void 0, void 0, void 0, func
 chatServer.listen(APP_PORT, () => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     console.log(`🚀 Server running on port ${APP_PORT} in ${(_a = process.env.NODE_ENV) === null || _a === void 0 ? void 0 : _a.trim()} Mode`);
-    yield (0, db_1.default)(DATABASE_URI);
+    yield (0, db_1.default)();
 }));

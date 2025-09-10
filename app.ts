@@ -245,6 +245,6 @@ chatServer.listen(APP_PORT, async () => {
   console.log(
     `🚀 Server running on port ${APP_PORT} in ${process.env.NODE_ENV?.trim()} Mode`
   );
-  await connectDB(DATABASE_URI);
+  await connectDB();
 });
 

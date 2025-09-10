@@ -10,10 +10,13 @@ import {
   getAllRequests,
   getMyFriends,
   getUserProfileDetail,
-  getAllUser,
+ 
 } from "../../controllers/user.controller";
+import  {getAllUsers}  from "../../controllers/admin.controller";
 
-import { registerValidator, validateHandle } from "../../lib/validators";
+
+import { registerValidator } from "../../lib/validators";
+import { validateHandle } from "../../lib/validators";
 import { isAuthenticated } from "../../middlewares/auth";
 import { singleAvatar } from "../../middlewares/multer";
 
@@ -55,7 +58,7 @@ userRoutes.get("/get-user", getUser);
  * @route   GET /api/users/all-users
  * @desc    Get all users
  */
-userRoutes.get("/all-users", getAllUser);
+userRoutes.get("/all-users", getAllUsers);
 
 /**
  * @route   GET /api/users/get-user-profile-detail

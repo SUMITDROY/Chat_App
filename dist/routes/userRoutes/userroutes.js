@@ -2,7 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const user_controller_1 = require("../../controllers/user.controller");
+const admin_controller_1 = require("../../controllers/admin.controller");
 const validators_1 = require("../../lib/validators");
+const validators_2 = require("../../lib/validators");
 const auth_1 = require("../../middlewares/auth");
 const multer_1 = require("../../middlewares/multer");
 const userRoutes = (0, express_1.Router)();
@@ -11,7 +13,7 @@ const userRoutes = (0, express_1.Router)();
  * @desc    Register a new user
  * @access  Public
  */
-userRoutes.post("/create", multer_1.singleAvatar, (0, validators_1.registerValidator)(), validators_1.validateHandle, user_controller_1.createUser);
+userRoutes.post("/create", multer_1.singleAvatar, (0, validators_1.registerValidator)(), validators_2.validateHandle, user_controller_1.createUser);
 /**
  * @route   POST /api/users
  * @desc    Login user
@@ -32,7 +34,7 @@ userRoutes.get("/get-user", user_controller_1.getUser);
  * @route   GET /api/users/all-users
  * @desc    Get all users
  */
-userRoutes.get("/all-users", user_controller_1.getAllUser);
+userRoutes.get("/all-users", admin_controller_1.getAllUsers);
 /**
  * @route   GET /api/users/get-user-profile-detail
  * @desc    Get a specific user profile detail

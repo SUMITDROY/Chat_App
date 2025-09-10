@@ -1,7 +1,7 @@
 "use strict";
 // socketManager.ts
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSocketIDWithoutEmitter = exports.getSocketID = exports.removeSocketID = exports.addSocketID = exports.getUserSocketIDs = void 0;
+exports.getSocketIDWithoutEmitter = exports.getSocketID = exports.unregisterSocket = exports.registerSocket = exports.getUserSocketIDs = void 0;
 // A map to store userID -> socketID
 const userSocketIDs = new Map();
 /**
@@ -10,20 +10,21 @@ const userSocketIDs = new Map();
 const getUserSocketIDs = () => userSocketIDs;
 exports.getUserSocketIDs = getUserSocketIDs;
 /**
- * Add a socket ID for a user
+ * Register a socket ID for a user
  */
-const addSocketID = (userID, socketID) => {
+const registerSocket = (userID, socketID) => {
     userSocketIDs.set(userID, socketID);
-    console.log(userSocketIDs, "userSocketIDs");
+    console.log("✅ Registered Socket:", userSocketIDs);
 };
-exports.addSocketID = addSocketID;
+exports.registerSocket = registerSocket;
 /**
- * Remove a socket ID for a user
+ * Unregister a socket ID for a user
  */
-const removeSocketID = (userID) => {
+const unregisterSocket = (userID) => {
     userSocketIDs.delete(userID);
+    console.log(`❌ Socket removed for user: ${userID}`);
 };
-exports.removeSocketID = removeSocketID;
+exports.unregisterSocket = unregisterSocket;
 /**
  * Get an array of socket IDs for a list of user IDs
  */
@@ -35,11 +36,8 @@ exports.getSocketID = getSocketID;
  * Get socket IDs for a list of users excluding the emitter's user ID
  */
 const getSocketIDWithoutEmitter = (userIDs, currentUserID) => {
-    return userIDs.map((userId) => {
-        if (userId === currentUserID) {
-            return undefined;
-        }
-        return userSocketIDs.get(userId.toString());
-    });
+    return userIDs
+        .filter((userId) => userId !== currentUserID)
+        .map((userId) => userSocketIDs.get(userId.toString()));
 };
 exports.getSocketIDWithoutEmitter = getSocketIDWithoutEmitter;
